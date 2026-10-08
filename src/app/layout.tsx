@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { WalletConnect, useWallet } from "@/components/WalletConnect"
+import { Toaster } from "@/components/Toaster"
 import { cn } from "@/lib/utils"
 import "@/styles/globals.css"
 
@@ -83,6 +84,7 @@ export default function RootLayout({
               PropFi &mdash; Tokenized Real Estate Protocol
             </div>
           </footer>
+          <Toaster />
         </div>
       </body>
     </html>

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { isFreighterAvailable, createFreighterSigner } from "@/lib/propfi"
+import { toast } from "@/hooks/useToast"
 
 interface WalletState {
   address: string
@@ -23,8 +24,18 @@ export function useWallet() {
       const signer = createFreighterSigner()
       const publicKey = await signer.getPublicKey()
       setWallet({ address: publicKey, connected: true })
+      toast({
+        title: "Wallet Connected",
+        description: `Connected as ${publicKey.slice(0, 6)}...${publicKey.slice(-4)}`,
+        variant: "success",
+      })
     } catch (err) {
       console.error("Wallet connection failed:", err)
+      toast({
+        title: "Connection Failed",
+        description: err instanceof Error ? err.message : "Failed to connect wallet",
+        variant: "destructive",
+      })
       throw err
     } finally {
       setLoading(false)
@@ -33,6 +44,11 @@ export function useWallet() {
 
   const disconnect = useCallback(() => {
     setWallet({ address: "", connected: false })
+    toast({
+      title: "Wallet Disconnected",
+      description: "Your wallet has been disconnected.",
+      variant: "default",
+    })
   }, [])
 
   return { wallet, loading, connect, disconnect }

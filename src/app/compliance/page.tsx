@@ -7,11 +7,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { useWallet } from "@/components/WalletConnect"
+import { useToast } from "@/hooks/useToast"
 
 type AttestationStatus = "none" | "pending" | "verified" | "expired"
 
 export default function CompliancePage() {
   const { wallet } = useWallet()
+  const { toast } = useToast()
   const [status, setStatus] = useState<AttestationStatus>("none")
   const [jurisdiction, setJurisdiction] = useState("US")
   const [proofHash, setProofHash] = useState("")
@@ -25,13 +27,40 @@ export default function CompliancePage() {
 
   const handleAttest = async () => {
     setStatus("pending")
-    await new Promise((r) => setTimeout(r, 1500))
-    setStatus("verified")
+    try {
+      await new Promise((r) => setTimeout(r, 1500))
+      setStatus("verified")
+      toast({
+        title: "Attestation Submitted",
+        description: "Your KYC attestation has been verified successfully.",
+        variant: "success",
+      })
+    } catch {
+      setStatus("none")
+      toast({
+        title: "Attestation Failed",
+        description: "Failed to submit attestation. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
 
   const handleRevoke = async () => {
-    setStatus("none")
-    setProofHash("")
+    try {
+      setStatus("none")
+      setProofHash("")
+      toast({
+        title: "Attestation Revoked",
+        description: "Your KYC attestation has been revoked.",
+        variant: "success",
+      })
+    } catch {
+      toast({
+        title: "Revoke Failed",
+        description: "Failed to revoke attestation. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
 
   const statusConfig: Record<AttestationStatus, { label: string; variant: "success" | "warning" | "secondary" | "destructive" }> = {

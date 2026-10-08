@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useWallet } from "@/components/WalletConnect"
+import { useToast } from "@/hooks/useToast"
 import { PropertyStatus } from "@/lib/propfi"
 
 interface PropertyItem {
@@ -31,6 +32,7 @@ const statusBadgeVariant: Record<PropertyStatus, "default" | "secondary" | "warn
 
 export default function PropertiesPage() {
   const { wallet } = useWallet()
+  const { toast } = useToast()
   const [properties] = useState<PropertyItem[]>(MOCK_PROPERTIES)
   const [search, setSearch] = useState("")
   const [mounted, setMounted] = useState(false)
@@ -52,6 +54,22 @@ export default function PropertiesPage() {
     if (num >= 1_000_000) return `$${(num / 1_000_000).toFixed(1)}M`
     if (num >= 1_000) return `$${(num / 1_000).toFixed(0)}K`
     return `$${num}`
+  }
+
+  const handleBuyFractions = async (propertyId: number) => {
+    toast({
+      title: "Buy Fractions",
+      description: `Redirecting to buy fractions for Property #${propertyId}...`,
+      variant: "default",
+    })
+  }
+
+  const handleViewDetails = (propertyId: number) => {
+    toast({
+      title: "View Details",
+      description: `Opening details for Property #${propertyId}`,
+      variant: "default",
+    })
   }
 
   return (
@@ -103,10 +121,10 @@ export default function PropertiesPage() {
                 </div>
                 {wallet.connected && (
                   <div className="flex gap-2 pt-2">
-                    <Button size="sm" className="flex-1">
+                    <Button size="sm" className="flex-1" onClick={() => handleBuyFractions(property.id)}>
                       Buy Fractions
                     </Button>
-                    <Button size="sm" variant="outline" className="flex-1">
+                    <Button size="sm" variant="outline" className="flex-1" onClick={() => handleViewDetails(property.id)}>
                       View Details
                     </Button>
                   </div>
