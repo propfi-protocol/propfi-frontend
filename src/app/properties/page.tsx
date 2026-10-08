@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { useWallet } from "@/components/WalletConnect"
 import { useToast } from "@/hooks/useToast"
 import { PropertyStatus } from "@/lib/propfi"
+import { SkeletonPropertyCard } from "@/components/ui/skeleton"
 
 interface PropertyItem {
   id: number
@@ -36,9 +37,14 @@ export default function PropertiesPage() {
   const [properties] = useState<PropertyItem[]>(MOCK_PROPERTIES)
   const [search, setSearch] = useState("")
   const [mounted, setMounted] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     setMounted(true)
+    const timer = setTimeout(() => {
+      setLoading(false)
+    }, 600)
+    return () => clearTimeout(timer)
   }, [])
 
   if (!mounted) return null
@@ -87,11 +93,16 @@ export default function PropertiesPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-sm"
+          disabled={loading}
         />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {filtered.length === 0 ? (
+        {loading ? (
+          Array.from({ length: 6 }).map((_, i) => (
+            <SkeletonPropertyCard key={i} />
+          ))
+        ) : filtered.length === 0 ? (
           <Card className="col-span-full">
             <CardContent className="p-6 text-center text-muted-foreground">
               No properties found.

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useWallet } from "@/components/WalletConnect"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { SkeletonDashboardStats, SkeletonCard } from "@/components/ui/skeleton"
 
 interface PortfolioSummary {
   totalProperties: number
@@ -22,9 +23,14 @@ export default function DashboardPage() {
     activeLoans: 0,
   })
   const [mounted, setMounted] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     setMounted(true)
+    const timer = setTimeout(() => {
+      setLoading(false)
+    }, 800)
+    return () => clearTimeout(timer)
   }, [])
 
   if (!mounted) return null
@@ -40,44 +46,48 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Properties</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{summary.totalProperties}</div>
-            <p className="text-xs text-muted-foreground">Owned & invested</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Fractions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{summary.totalFractions.toString()}</div>
-            <p className="text-xs text-muted-foreground">Total fraction balance</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Yield</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{summary.pendingYield.toString()}</div>
-            <p className="text-xs text-muted-foreground">Unclaimed rent yield</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Loans</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{summary.activeLoans}</div>
-            <p className="text-xs text-muted-foreground">Outstanding mortgages</p>
-          </CardContent>
-        </Card>
-      </div>
+      {loading ? (
+        <SkeletonDashboardStats />
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Properties</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{summary.totalProperties}</div>
+              <p className="text-xs text-muted-foreground">Owned & invested</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Fractions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{summary.totalFractions.toString()}</div>
+              <p className="text-xs text-muted-foreground">Total fraction balance</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Pending Yield</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{summary.pendingYield.toString()}</div>
+              <p className="text-xs text-muted-foreground">Unclaimed rent yield</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active Loans</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{summary.activeLoans}</div>
+              <p className="text-xs text-muted-foreground">Outstanding mortgages</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       <Tabs defaultValue="investments" className="space-y-4">
         <TabsList>
@@ -92,7 +102,9 @@ export default function DashboardPage() {
               <CardTitle>Investments</CardTitle>
             </CardHeader>
             <CardContent>
-              {wallet.connected ? (
+              {loading ? (
+                <SkeletonCard />
+              ) : wallet.connected ? (
                 <p className="text-sm text-muted-foreground">
                   No investments yet. Browse properties to get started.
                 </p>
@@ -111,9 +123,13 @@ export default function DashboardPage() {
               <CardTitle>Yield History</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Rent distribution history will appear here.
-              </p>
+              {loading ? (
+                <SkeletonCard />
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Rent distribution history will appear here.
+                </p>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -124,9 +140,13 @@ export default function DashboardPage() {
               <CardTitle>Loans</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
-                No active loans. Check your mortgage status here.
-              </p>
+              {loading ? (
+                <SkeletonCard />
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  No active loans. Check your mortgage status here.
+                </p>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

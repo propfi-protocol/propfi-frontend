@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { useWallet } from "@/components/WalletConnect"
 import { useToast } from "@/hooks/useToast"
+import { SkeletonCard } from "@/components/ui/skeleton"
 
 type AttestationStatus = "none" | "pending" | "verified" | "expired"
 
@@ -18,9 +19,14 @@ export default function CompliancePage() {
   const [jurisdiction, setJurisdiction] = useState("US")
   const [proofHash, setProofHash] = useState("")
   const [mounted, setMounted] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     setMounted(true)
+    const timer = setTimeout(() => {
+      setLoading(false)
+    }, 500)
+    return () => clearTimeout(timer)
   }, [])
 
   if (!mounted) return null
@@ -85,6 +91,12 @@ export default function CompliancePage() {
             Connect your wallet to manage compliance attestations.
           </CardContent>
         </Card>
+      ) : loading ? (
+        <div className="grid gap-6 md:grid-cols-2">
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard className="md:col-span-2" />
+        </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
