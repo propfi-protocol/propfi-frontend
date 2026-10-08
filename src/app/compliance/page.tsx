@@ -1,6 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { useWallet } from "@/components/WalletConnect"
 import { useToast } from "@/hooks/useToast"
 import { SkeletonCard } from "@/components/ui/skeleton"
+import { attestationSchema, type AttestationFormData, supportedJurisdictions } from "@/lib/validations"
 
 type AttestationStatus = "none" | "pending" | "verified" | "expired"
 
@@ -16,10 +19,20 @@ export default function CompliancePage() {
   const { wallet } = useWallet()
   const { toast } = useToast()
   const [status, setStatus] = useState<AttestationStatus>("none")
-  const [jurisdiction, setJurisdiction] = useState("US")
-  const [proofHash, setProofHash] = useState("")
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(true)
+
+  const form = useForm<AttestationFormData>({
+    resolver: zodResolver(attestationSchema),
+    defaultValues: {
+      jurisdiction: "US",
+      proofHash: "",
+    },
+  })
+
+  const { watch, setValue, reset } = form
+  const jurisdiction = watch("jurisdiction")
+  const proofHash = watch("proofHash")
 
   useEffect(() => {
     setMounted(true)
@@ -31,7 +44,7 @@ export default function CompliancePage() {
 
   if (!mounted) return null
 
-  const handleAttest = async () => {
+  const handleAttest = async (data: AttestationFormData) => {
     setStatus("pending")
     try {
       await new Promise((r) => setTimeout(r, 1500))
@@ -54,7 +67,7 @@ export default function CompliancePage() {
   const handleRevoke = async () => {
     try {
       setStatus("none")
-      setProofHash("")
+      reset({ jurisdiction: "US", proofHash: "" })
       toast({
         title: "Attestation Revoked",
         description: "Your KYC attestation has been revoked.",
@@ -159,33 +172,43 @@ export default function CompliancePage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {status !== "verified" ? (
-                <>
+                <form onSubmit={form.handleSubmit(handleAttest)} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="jurisdiction">Jurisdiction</Label>
                     <Input
                       id="jurisdiction"
-                      value={jurisdiction}
-                      onChange={(e) => setJurisdiction(e.target.value)}
+                      {...form.register("jurisdiction")}
                       placeholder="e.g. US, EU, UK"
+                      disabled={status === "pending"}
                     />
+                    {form.formState.errors.jurisdiction && (
+                      <p className="text-sm text-destructive" role="alert">
+                        {form.formState.errors.jurisdiction.message}
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="proofHash">Proof Hash</Label>
                     <Input
                       id="proofHash"
-                      value={proofHash}
-                      onChange={(e) => setProofHash(e.target.value)}
+                      {...form.register("proofHash")}
                       placeholder="Enter KYC proof hash"
+                      disabled={status === "pending"}
                     />
+                    {form.formState.errors.proofHash && (
+                      <p className="text-sm text-destructive" role="alert">
+                        {form.formState.errors.proofHash.message}
+                      </p>
+                    )}
                   </div>
                   <Button
-                    onClick={handleAttest}
-                    disabled={status === "pending" || !proofHash || !jurisdiction}
+                    type="submit"
+                    disabled={status === "pending"}
                     className="w-full"
                   >
                     {status === "pending" ? "Submitting..." : "Submit Attestation"}
                   </Button>
-                </>
+                </form>
               ) : (
                 <div className="space-y-4">
                   <p className="text-sm text-muted-foreground">
@@ -205,12 +228,15 @@ export default function CompliancePage() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
-                {["US", "EU", "UK", "SG", "AE", "JP"].map((j) => (
+                {supportedJurisdictions.map((j) => (
                   <Badge key={j} variant="outline" className="text-sm">
                     {j}
                   </Badge>
                 ))}
               </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Select a supported jurisdiction when submitting your attestation.
+              </p>
             </CardContent>
           </Card>
         </div>
