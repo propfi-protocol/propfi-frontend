@@ -11,6 +11,7 @@ import {
   PropertyStatus,
   LoanStatus,
 } from "@propfi/sdk"
+import { config } from "./config"
 
 export type {
   PropFiSDK,
@@ -24,11 +25,20 @@ export type {
 }
 export { PropertyStatus, LoanStatus }
 
-const DEFAULT_RPC_URL = "https://soroban-testnet.stellar.org"
-const DEFAULT_NETWORK = "TESTNET"
+export function createPropFiSDK(): PropFiSDK {
+  return createPropFi({
+    rpcUrl: config.rpcUrl,
+    complianceRegistryId: config.complianceRegistryId,
+    propertyRegistryId: config.propertyRegistryId,
+    fractionVaultId: config.fractionVaultId,
+    mortgagePoolId: config.mortgagePoolId,
+  })
+}
 
-export function createPropFiSDK(config: PropFiConfig): PropFiSDK {
-  return createPropFi(config)
+function getNetworkPassphrase(): string {
+  return config.stellarNetwork === "testnet"
+    ? "Test SDF Network ; September 2015"
+    : "Public Global Stellar Network ; September 2015"
 }
 
 export interface FreighterSigner {
@@ -44,6 +54,7 @@ function getFreighter() {
 }
 
 export function createFreighterSigner(): FreighterSigner {
+  const networkPassphrase = getNetworkPassphrase()
   return {
     async getPublicKey(): Promise<string> {
       const f = getFreighter()
@@ -53,10 +64,7 @@ export function createFreighterSigner(): FreighterSigner {
     async signTransaction(txXdr: string): Promise<string> {
       const f = getFreighter()
       const { signedTxXdr } = await f.signTransaction(txXdr, {
-        networkPassphrase:
-          DEFAULT_NETWORK === "TESTNET"
-            ? "Test SDF Network ; September 2015"
-            : "Public Global Stellar Network ; September 2015",
+        networkPassphrase,
       })
       return signedTxXdr
     },
