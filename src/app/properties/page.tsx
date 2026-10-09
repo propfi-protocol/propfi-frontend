@@ -80,71 +80,102 @@ export default function PropertiesPage() {
 
   return (
     <div className="space-y-8">
-      <div>
+      <header>
         <h1 className="text-3xl font-bold">Properties</h1>
         <p className="text-muted-foreground mt-1">
           Browse tokenized real estate properties
         </p>
-      </div>
+      </header>
 
-      <div className="flex gap-4">
+      <section aria-labelledby="search-heading" className="space-y-2">
+        <h2 id="search-heading" className="sr-only">
+          Search Properties
+        </h2>
+        <label htmlFor="property-search" className="sr-only">
+          Search by location or property ID
+        </label>
         <Input
+          id="property-search"
           placeholder="Search by location or ID..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-sm"
           disabled={loading}
+          aria-describedby="search-hint"
         />
-      </div>
+        <p id="search-hint" className="text-sm text-muted-foreground">
+          Search properties by location name or property ID
+        </p>
+      </section>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {loading ? (
-          Array.from({ length: 6 }).map((_, i) => (
-            <SkeletonPropertyCard key={i} />
-          ))
-        ) : filtered.length === 0 ? (
-          <Card className="col-span-full">
-            <CardContent className="p-6 text-center text-muted-foreground">
-              No properties found.
-            </CardContent>
-          </Card>
-        ) : (
-          filtered.map((property) => (
-            <Card key={property.id} className="overflow-hidden">
-              <div className="h-2 bg-primary" />
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">Property #{property.id}</CardTitle>
-                  <Badge variant={statusBadgeVariant[property.status]}>
-                    {property.status}
-                  </Badge>
-                </div>
-                <CardDescription>{property.location}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Valuation</span>
-                  <span className="font-medium">{formatValuation(property.valuation)}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Owner</span>
-                  <span className="font-mono text-xs">{property.owner}</span>
-                </div>
-                {wallet.connected && (
-                  <div className="flex gap-2 pt-2">
-                    <Button size="sm" className="flex-1" onClick={() => handleBuyFractions(property.id)}>
-                      Buy Fractions
-                    </Button>
-                    <Button size="sm" variant="outline" className="flex-1" onClick={() => handleViewDetails(property.id)}>
-                      View Details
-                    </Button>
-                  </div>
-                )}
+      <section aria-labelledby="properties-heading">
+        <h2 id="properties-heading" className="sr-only">
+          Property Listings
+        </h2>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3" role="list">
+          {loading ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <SkeletonPropertyCard key={i} aria-label={`Loading property ${i + 1}`} />
+            ))
+          ) : filtered.length === 0 ? (
+            <Card className="col-span-full" role="status">
+              <CardContent className="p-6 text-center text-muted-foreground">
+                No properties found matching your search.
               </CardContent>
             </Card>
-          ))
-        )}
-      </div>
+          ) : (
+            filtered.map((property) => (
+              <article key={property.id} className="overflow-hidden" role="listitem">
+                <Card className="overflow-hidden h-full">
+                  <div className="h-2 bg-primary" aria-hidden="true" />
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg">Property #{property.id}</CardTitle>
+                      <Badge variant={statusBadgeVariant[property.status]} aria-label={`Status: ${property.status}`}>
+                        {property.status}
+                      </Badge>
+                    </div>
+                    <CardDescription>{property.location}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <dl className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <dt className="text-muted-foreground">Valuation</dt>
+                        <dd className="font-medium">{formatValuation(property.valuation)}</dd>
+                      </div>
+                      <div className="flex justify-between">
+                        <dt className="text-muted-foreground">Owner</dt>
+                        <dd className="font-mono text-xs">{property.owner}</dd>
+                      </div>
+                    </dl>
+                    {wallet.connected && (
+                      <div className="flex gap-2 pt-2">
+                        <Button
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => handleBuyFractions(property.id)}
+                          aria-label={`Buy fractions for Property #${property.id}`}
+                        >
+                          Buy Fractions
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => handleViewDetails(property.id)}
+                          aria-label={`View details for Property #${property.id}`}
+                        >
+                          View Details
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </article>
+            ))
+          )}
+        </div>
+      </section>
     </div>
   )
 }

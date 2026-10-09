@@ -23,26 +23,41 @@ export default function ClientLayout({
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="border-b">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md"
+      >
+        Skip to main content
+      </a>
+
+      <header className="border-b" role="banner">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/dashboard" className="text-xl font-bold text-primary">
+          <Link
+            href="/dashboard"
+            className="text-xl font-bold text-primary"
+            aria-label="PropFi - Tokenized Real Estate Protocol"
+          >
             PropFi
           </Link>
-          <nav className="hidden md:flex items-center gap-6">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
-                  pathname === item.href
-                    ? "text-primary"
-                    : "text-muted-foreground"
-                )}
-              >
-                {item.label}
-              </Link>
-            ))}
+          <nav className="hidden md:flex items-center gap-6" aria-label="Main navigation">
+            <ul className="flex items-center gap-6" role="list">
+              {navItems.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      "text-sm font-medium transition-colors hover:text-primary",
+                      pathname === item.href
+                        ? "text-primary"
+                        : "text-muted-foreground"
+                    )}
+                    aria-current={pathname === item.href ? "page" : undefined}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </nav>
           <div className="flex items-center gap-3">
             <ThemeToggle />
@@ -56,30 +71,34 @@ export default function ClientLayout({
         </div>
       </header>
 
-      <nav className="md:hidden border-b">
+      <nav className="md:hidden border-b" aria-label="Mobile navigation">
         <div className="container mx-auto px-4 h-12 flex items-center justify-center gap-6">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "text-sm font-medium transition-colors hover:text-primary",
-                pathname === item.href
-                  ? "text-primary"
-                  : "text-muted-foreground"
-              )}
-            >
-              {item.label}
-            </Link>
-          ))}
+          <ul className="flex items-center gap-6" role="list">
+            {navItems.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className={cn(
+                    "text-sm font-medium transition-colors hover:text-primary",
+                    pathname === item.href
+                      ? "text-primary"
+                      : "text-muted-foreground"
+                  )}
+                  aria-current={pathname === item.href ? "page" : undefined}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </nav>
 
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main id="main-content" className="flex-1 container mx-auto px-4 py-8" role="main">
         {children}
       </main>
 
-      <footer className="border-t py-4">
+      <footer className="border-t py-4" role="contentinfo">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
           PropFi &mdash; Tokenized Real Estate Protocol
         </div>

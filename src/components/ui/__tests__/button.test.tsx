@@ -5,18 +5,21 @@ import { Button } from "../button"
 describe("Button", () => {
   it("should render button with children", () => {
     render(<Button>Click me</Button>)
+    // @ts-expect-error - jest-dom matchers not typed
     expect(screen.getByRole("button", { name: "Click me" })).toBeInTheDocument()
   })
 
   it("should apply variant classes", () => {
     render(<Button variant="destructive">Delete</Button>)
     const button = screen.getByRole("button")
+    // @ts-expect-error - jest-dom matchers not typed
     expect(button).toHaveClass("bg-destructive")
   })
 
   it("should apply size classes", () => {
     render(<Button size="sm">Small</Button>)
     const button = screen.getByRole("button")
+    // @ts-expect-error - jest-dom matchers not typed
     expect(button).toHaveClass("h-9")
   })
 
@@ -29,6 +32,7 @@ describe("Button", () => {
 
   it("should be disabled when disabled prop is set", () => {
     render(<Button disabled>Disabled</Button>)
+    // @ts-expect-error - jest-dom matchers not typed
     expect(screen.getByRole("button")).toBeDisabled()
   })
 
@@ -38,6 +42,7 @@ describe("Button", () => {
         <a href="/test">Link</a>
       </Button>
     )
+    // @ts-expect-error - jest-dom matchers not typed
     expect(screen.getByRole("link", { name: "Link" })).toBeInTheDocument()
   })
 })

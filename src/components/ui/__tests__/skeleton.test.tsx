@@ -6,7 +6,9 @@ describe("Skeleton", () => {
   it("should render skeleton with default classes", () => {
     render(<Skeleton />)
     const skeleton = screen.getByTestId("skeleton")
+    // @ts-expect-error - jest-dom matchers not typed
     expect(skeleton).toHaveClass("animate-pulse")
+    // @ts-expect-error - jest-dom matchers not typed
     expect(skeleton).toHaveClass("bg-muted")
   })
 
@@ -20,8 +22,11 @@ describe("Skeleton", () => {
     render(<SkeletonCard />)
     const skeletons = screen.getAllByTestId("skeleton")
     const card = skeletons[0].closest(".rounded-lg.border")
+    // @ts-expect-error - jest-dom matchers not typed
     expect(card).toBeInTheDocument()
+    // @ts-expect-error - jest-dom matchers not typed
     expect(card).toHaveClass("rounded-lg")
+    // @ts-expect-error - jest-dom matchers not typed
     expect(card).toHaveClass("border")
   })
 
@@ -35,7 +40,9 @@ describe("Skeleton", () => {
     render(<SkeletonDashboardStats />)
     const skeletons = screen.getAllByTestId("skeleton")
     const grid = skeletons[0].closest(".grid")
+    // @ts-expect-error - jest-dom matchers not typed
     expect(grid).toBeInTheDocument()
+    // @ts-expect-error - jest-dom matchers not typed
     expect(grid).toHaveClass("grid")
   })
 

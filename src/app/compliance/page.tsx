@@ -30,7 +30,7 @@ export default function CompliancePage() {
     },
   })
 
-  const { watch, setValue, reset } = form
+  const { watch, reset } = form
   const jurisdiction = watch("jurisdiction")
   const proofHash = watch("proofHash")
 
@@ -91,155 +91,193 @@ export default function CompliancePage() {
 
   return (
     <div className="space-y-8">
-      <div>
+      <header>
         <h1 className="text-3xl font-bold">Compliance</h1>
         <p className="text-muted-foreground mt-1">
           KYC attestation and compliance management
         </p>
-      </div>
+      </header>
 
       {!wallet.connected ? (
-        <Card>
-          <CardContent className="p-6 text-center text-muted-foreground">
-            Connect your wallet to manage compliance attestations.
-          </CardContent>
-        </Card>
+        <section aria-labelledby="wallet-required-heading">
+          <h2 id="wallet-required-heading" className="sr-only">
+            Wallet Connection Required
+          </h2>
+          <Card>
+            <CardContent className="p-6 text-center text-muted-foreground">
+              Connect your wallet to manage compliance attestations.
+            </CardContent>
+          </Card>
+        </section>
       ) : loading ? (
-        <div className="grid gap-6 md:grid-cols-2">
-          <SkeletonCard />
-          <SkeletonCard />
-          <SkeletonCard className="md:col-span-2" />
-        </div>
+        <section aria-label="Loading compliance data">
+          <div className="grid gap-6 md:grid-cols-2" role="status" aria-busy="true">
+            <SkeletonCard aria-label="Loading attestation status" />
+            <SkeletonCard aria-label="Loading attestation form" />
+            <SkeletonCard className="md:col-span-2" aria-label="Loading supported jurisdictions" />
+          </div>
+        </section>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Attestation Status</CardTitle>
-              <CardDescription>Your current KYC attestation status</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-3">
-                <Badge variant={statusConfig[status].variant}>
-                  {statusConfig[status].label}
-                </Badge>
-                {status === "verified" && (
-                  <span className="text-sm text-muted-foreground">
-                    Expires in 365 days
-                  </span>
-                )}
-              </div>
-
-              {status === "none" && (
-                <p className="text-sm text-muted-foreground">
-                  You need to complete KYC attestation to participate in property
-                  investments and transfers.
-                </p>
-              )}
-
-              {status === "verified" && (
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Wallet</span>
-                    <span className="font-mono">
-                      {wallet.address.slice(0, 6)}...{wallet.address.slice(-4)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Jurisdiction</span>
-                    <span>{jurisdiction}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Proof Hash</span>
-                    <span className="font-mono text-xs">
-                      {proofHash.slice(0, 10)}...
-                    </span>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                {status === "verified" ? "Manage Attestation" : "Request Attestation"}
-              </CardTitle>
-              <CardDescription>
-                {status === "verified"
-                  ? "Revoke your current attestation"
-                  : "Submit your KYC proof for verification"}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {status !== "verified" ? (
-                <form onSubmit={form.handleSubmit(handleAttest)} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="jurisdiction">Jurisdiction</Label>
-                    <Input
-                      id="jurisdiction"
-                      {...form.register("jurisdiction")}
-                      placeholder="e.g. US, EU, UK"
-                      disabled={status === "pending"}
-                    />
-                    {form.formState.errors.jurisdiction && (
-                      <p className="text-sm text-destructive" role="alert">
-                        {form.formState.errors.jurisdiction.message}
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="proofHash">Proof Hash</Label>
-                    <Input
-                      id="proofHash"
-                      {...form.register("proofHash")}
-                      placeholder="Enter KYC proof hash"
-                      disabled={status === "pending"}
-                    />
-                    {form.formState.errors.proofHash && (
-                      <p className="text-sm text-destructive" role="alert">
-                        {form.formState.errors.proofHash.message}
-                      </p>
-                    )}
-                  </div>
-                  <Button
-                    type="submit"
-                    disabled={status === "pending"}
-                    className="w-full"
-                  >
-                    {status === "pending" ? "Submitting..." : "Submit Attestation"}
-                  </Button>
-                </form>
-              ) : (
-                <div className="space-y-4">
-                  <p className="text-sm text-muted-foreground">
-                    Your attestation is active. You can revoke it at any time.
-                  </p>
-                  <Button onClick={handleRevoke} variant="destructive" className="w-full">
-                    Revoke Attestation
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card className="md:col-span-2">
-            <CardHeader>
-              <CardTitle>Supported Jurisdictions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {supportedJurisdictions.map((j) => (
-                  <Badge key={j} variant="outline" className="text-sm">
-                    {j}
+        <>
+          <section aria-labelledby="status-heading" className="space-y-6">
+            <h2 id="status-heading" className="sr-only">
+              Attestation Status
+            </h2>
+            <Card>
+              <CardHeader>
+                <CardTitle>Attestation Status</CardTitle>
+                <CardDescription>Your current KYC attestation status</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center gap-3" role="status" aria-live="polite">
+                  <Badge variant={statusConfig[status].variant}>
+                    {statusConfig[status].label}
                   </Badge>
-                ))}
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                Select a supported jurisdiction when submitting your attestation.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+                  {status === "verified" && (
+                    <span className="text-sm text-muted-foreground">
+                      Expires in 365 days
+                    </span>
+                  )}
+                </div>
+
+                {status === "none" && (
+                  <p className="text-sm text-muted-foreground" role="alert">
+                    You need to complete KYC attestation to participate in property
+                    investments and transfers.
+                  </p>
+                )}
+
+                {status === "verified" && (
+                  <dl className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <dt className="text-muted-foreground">Wallet</dt>
+                      <dd className="font-mono">
+                        {wallet.address.slice(0, 6)}...{wallet.address.slice(-4)}
+                      </dd>
+                    </div>
+                    <div className="flex justify-between">
+                      <dt className="text-muted-foreground">Jurisdiction</dt>
+                      <dd>{jurisdiction}</dd>
+                    </div>
+                    <div className="flex justify-between">
+                      <dt className="text-muted-foreground">Proof Hash</dt>
+                      <dd className="font-mono text-xs">
+                        {proofHash.slice(0, 10)}...
+                      </dd>
+                    </div>
+                  </dl>
+                )}
+              </CardContent>
+            </Card>
+          </section>
+
+          <section aria-labelledby="action-heading" className="space-y-6">
+            <h2 id="action-heading" className="sr-only">
+              {status === "verified" ? "Manage Attestation" : "Request Attestation"}
+            </h2>
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  {status === "verified" ? "Manage Attestation" : "Request Attestation"}
+                </CardTitle>
+                <CardDescription>
+                  {status === "verified"
+                    ? "Revoke your current attestation"
+                    : "Submit your KYC proof for verification"}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {status !== "verified" ? (
+                  <form onSubmit={form.handleSubmit(handleAttest)} className="space-y-4" noValidate>
+                    <div className="space-y-2">
+                      <Label htmlFor="jurisdiction">Jurisdiction</Label>
+                      <Input
+                        id="jurisdiction"
+                        {...form.register("jurisdiction")}
+                        placeholder="e.g. US, EU, UK"
+                        disabled={status === "pending"}
+                        aria-describedby="jurisdiction-hint"
+                        aria-invalid={!!form.formState.errors.jurisdiction}
+                      />
+                      <p id="jurisdiction-hint" className="text-xs text-muted-foreground">
+                        Select your jurisdiction from the supported list below
+                      </p>
+                      {form.formState.errors.jurisdiction && (
+                        <p className="text-sm text-destructive" role="alert" id="jurisdiction-error">
+                          {form.formState.errors.jurisdiction.message}
+                        </p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="proofHash">Proof Hash</Label>
+                      <Input
+                        id="proofHash"
+                        {...form.register("proofHash")}
+                        placeholder="Enter KYC proof hash"
+                        disabled={status === "pending"}
+                        aria-describedby="proof-hash-hint"
+                        aria-invalid={!!form.formState.errors.proofHash}
+                      />
+                      <p id="proof-hash-hint" className="text-xs text-muted-foreground">
+                        Enter the cryptographic proof hash from your KYC provider
+                      </p>
+                      {form.formState.errors.proofHash && (
+                        <p className="text-sm text-destructive" role="alert" id="proof-hash-error">
+                          {form.formState.errors.proofHash.message}
+                        </p>
+                      )}
+                    </div>
+                    <Button
+                      type="submit"
+                      disabled={status === "pending"}
+                      className="w-full"
+                      aria-busy={status === "pending"}
+                    >
+                      {status === "pending" ? "Submitting..." : "Submit Attestation"}
+                    </Button>
+                  </form>
+                ) : (
+                  <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground" role="status">
+                      Your attestation is active. You can revoke it at any time.
+                    </p>
+                    <Button
+                      onClick={handleRevoke}
+                      variant="destructive"
+                      className="w-full"
+                      aria-label="Revoke your current KYC attestation"
+                    >
+                      Revoke Attestation
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </section>
+
+          <section aria-labelledby="jurisdictions-heading">
+            <h2 id="jurisdictions-heading" className="sr-only">
+              Supported Jurisdictions
+            </h2>
+            <Card className="md:col-span-2">
+              <CardHeader>
+                <CardTitle>Supported Jurisdictions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2" role="list" aria-label="Supported jurisdictions">
+                  {supportedJurisdictions.map((j) => (
+                    <Badge key={j} variant="outline" className="text-sm" role="listitem">
+                      {j}
+                    </Badge>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Select a supported jurisdiction when submitting your attestation.
+                </p>
+              </CardContent>
+            </Card>
+          </section>
+        </>
       )}
     </div>
   )

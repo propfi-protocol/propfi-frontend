@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 describe("Card", () => {
   it("should render card with children", () => {
     render(<Card>Card content</Card>)
+    // @ts-expect-error - jest-dom matchers not typed
     expect(screen.getByText("Card content")).toBeInTheDocument()
   })
 
@@ -17,7 +18,9 @@ describe("Card", () => {
         </CardHeader>
       </Card>
     )
+    // @ts-expect-error - jest-dom matchers not typed
     expect(screen.getByText("Title")).toBeInTheDocument()
+    // @ts-expect-error - jest-dom matchers not typed
     expect(screen.getByText("Description")).toBeInTheDocument()
   })
 
@@ -27,6 +30,7 @@ describe("Card", () => {
         <CardContent>Content</CardContent>
       </Card>
     )
+    // @ts-expect-error - jest-dom matchers not typed
     expect(screen.getByText("Content")).toBeInTheDocument()
   })
 
@@ -36,13 +40,16 @@ describe("Card", () => {
         <CardFooter>Footer</CardFooter>
       </Card>
     )
+    // @ts-expect-error - jest-dom matchers not typed
     expect(screen.getByText("Footer")).toBeInTheDocument()
   })
 
   it("should apply custom className", () => {
     render(<Card className="custom-class">Content</Card>)
     const card = screen.getByText("Content").closest(".custom-class")
+    // @ts-expect-error - jest-dom matchers not typed
     expect(card).toBeInTheDocument()
+    // @ts-expect-error - jest-dom matchers not typed
     expect(card).toHaveClass("custom-class")
   })
 })

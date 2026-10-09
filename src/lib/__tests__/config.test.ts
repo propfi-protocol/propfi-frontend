@@ -6,11 +6,12 @@ describe("config", () => {
   beforeEach(() => {
     vi.resetModules()
     process.env = { ...originalEnv }
-    process.env.NODE_ENV = "test"
+    vi.stubEnv("NODE_ENV", "test")
   })
 
   afterEach(() => {
     process.env = originalEnv
+    vi.unstubAllEnvs()
   })
 
   it("should create config with all required env vars", async () => {

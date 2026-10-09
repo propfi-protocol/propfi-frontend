@@ -72,14 +72,20 @@ export function WalletConnect({ wallet, loading, onConnect, onDisconnect }: Wall
 
   if (wallet.connected) {
     return (
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2">
-          <div className="h-2 w-2 rounded-full bg-green-500" />
+      <div className="flex items-center gap-3" role="group" aria-label="Wallet connection">
+        <div className="flex items-center gap-2" aria-live="polite">
+          <span className="sr-only">Wallet connected</span>
+          <span className="h-2 w-2 rounded-full bg-green-500" aria-hidden="true" />
           <span className="text-sm text-muted-foreground hidden sm:inline">
             {wallet.address.slice(0, 4)}...{wallet.address.slice(-4)}
           </span>
         </div>
-        <Button variant="outline" size="sm" onClick={onDisconnect}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onDisconnect}
+          aria-label={`Disconnect wallet ${wallet.address.slice(0, 4)}...${wallet.address.slice(-4)}`}
+        >
           Disconnect
         </Button>
       </div>
@@ -87,7 +93,13 @@ export function WalletConnect({ wallet, loading, onConnect, onDisconnect }: Wall
   }
 
   return (
-    <Button size="sm" onClick={onConnect} disabled={loading}>
+    <Button
+      size="sm"
+      onClick={onConnect}
+      disabled={loading}
+      aria-busy={loading}
+      aria-label="Connect Freighter wallet"
+    >
       {loading ? "Connecting..." : "Connect Wallet"}
     </Button>
   )
