@@ -10,7 +10,13 @@ interface ThemeContextType {
   resolvedTheme: "light" | "dark"
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
+const defaultContext: ThemeContextType = {
+  theme: "system",
+  setTheme: () => {},
+  resolvedTheme: "light",
+}
+
+const ThemeContext = createContext<ThemeContextType>(defaultContext)
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>("system")
@@ -60,21 +66,20 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return () => mediaQuery.removeEventListener("change", handleChange)
   }, [theme, mounted])
 
-  if (!mounted) {
-    return <>{children}</>
+  // Always provide context, even during SSR
+  const value = {
+    theme,
+    setTheme,
+    resolvedTheme: mounted ? resolvedTheme : "light",
   }
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, resolvedTheme }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   )
 }
 
 export function useTheme() {
-  const context = useContext(ThemeContext)
-  if (context === undefined) {
-    throw new Error("useTheme must be used within a ThemeProvider")
-  }
-  return context
+  return useContext(ThemeContext)
 }
