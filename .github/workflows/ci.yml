@@ -19,15 +19,16 @@ jobs:
           cache-dependency-path: package-lock.json
       - name: Setup PropFi SDK
         run: |
-          git clone https://github.com/propfi-protocol/propfi-sdk.git ../propfi-sdk
-          cd ../propfi-sdk
+          git clone https://github.com/propfi-protocol/propfi-sdk.git /tmp/propfi-sdk
+          cd /tmp/propfi-sdk
           npm ci --legacy-peer-deps
           npm run build
-      - name: Link SDK and install frontend
+      - name: Install frontend and link SDK
         run: |
           npm ci --legacy-peer-deps
-          rm -rf node_modules/@propfi/sdk
-          ln -s ../propfi-sdk node_modules/@propfi/sdk
+          rm -rf node_modules/@propfi
+          mkdir -p node_modules/@propfi
+          ln -s /tmp/propfi-sdk node_modules/@propfi/sdk
       - run: npm run build
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
@@ -44,13 +45,14 @@ jobs:
           cache-dependency-path: package-lock.json
       - name: Setup PropFi SDK
         run: |
-          git clone https://github.com/propfi-protocol/propfi-sdk.git ../propfi-sdk
-          cd ../propfi-sdk
+          git clone https://github.com/propfi-protocol/propfi-sdk.git /tmp/propfi-sdk
+          cd /tmp/propfi-sdk
           npm ci --legacy-peer-deps
           npm run build
-      - name: Link SDK and install frontend
+      - name: Install frontend and link SDK
         run: |
           npm ci --legacy-peer-deps
-          rm -rf node_modules/@propfi/sdk
-          ln -s ../propfi-sdk node_modules/@propfi/sdk
+          rm -rf node_modules/@propfi
+          mkdir -p node_modules/@propfi
+          ln -s /tmp/propfi-sdk node_modules/@propfi/sdk
       - run: npm run lint
