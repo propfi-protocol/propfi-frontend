@@ -19,6 +19,8 @@ jobs:
           cache-dependency-path: package-lock.json
       - run: npm ci
       - run: npm run build
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
 
   lint:
     name: Lint

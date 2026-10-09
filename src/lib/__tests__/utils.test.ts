@@ -8,8 +8,11 @@ describe("utils", () => {
     })
 
     it("should handle conditional classes", () => {
-      expect(cn("base", true && "conditional")).toBe("base conditional")
-      expect(cn("base", false && "conditional")).toBe("base")
+      const truthy = true
+      const falsy = false
+      expect(cn("base", truthy && "conditional")).toBe("base conditional")
+      expect(cn("base", falsy && "conditional")).toBe("base")
+      expect(cn("base", truthy && "conditional", falsy && "other")).toBe("base conditional")
     })
 
     it("should handle tailwind conflicts with tailwind-merge", () => {
@@ -25,7 +28,7 @@ describe("utils", () => {
     it("should handle empty inputs", () => {
       expect(cn()).toBe("")
       expect(cn("")).toBe("")
-      expect(cn(null as any, undefined as any)).toBe("")
+      expect(cn(null, undefined)).toBe("")
     })
   })
 })

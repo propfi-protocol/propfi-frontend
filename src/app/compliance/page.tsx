@@ -51,7 +51,7 @@ export default function CompliancePage() {
       setStatus("verified")
       toast({
         title: "Attestation Submitted",
-        description: "Your KYC attestation has been verified successfully.",
+        description: `Submitted for ${data.jurisdiction} jurisdiction.`,
         variant: "success",
       })
     } catch {

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useWallet } from "@/components/WalletConnect"
-import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { SkeletonDashboardStats, SkeletonCard } from "@/components/ui/skeleton"
 
@@ -16,7 +15,7 @@ interface PortfolioSummary {
 
 export default function DashboardPage() {
   const { wallet } = useWallet()
-  const [summary, setSummary] = useState<PortfolioSummary>({
+  const [summary] = useState<PortfolioSummary>({
     totalProperties: 0,
     totalFractions: BigInt(0),
     pendingYield: BigInt(0),
