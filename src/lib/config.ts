@@ -22,7 +22,9 @@ function getOptionalEnv(key: string, defaultValue: string): string {
 }
 
 export function createConfig(): PropFiConfig {
-  if (typeof window === "undefined") {
+  const isServer = typeof window === "undefined" || process.env.NODE_ENV === "test"
+  
+  if (isServer) {
     return {
       stellarNetwork: (getOptionalEnv("NEXT_PUBLIC_STELLAR_NETWORK", "testnet") as "testnet" | "mainnet"),
       rpcUrl: getOptionalEnv("NEXT_PUBLIC_RPC_URL", "https://soroban-testnet.stellar.org"),
