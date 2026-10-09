@@ -17,7 +17,17 @@ jobs:
           node-version: 20
           cache: npm
           cache-dependency-path: package-lock.json
-      - run: npm ci --legacy-peer-deps
+      - name: Setup PropFi SDK
+        run: |
+          git clone https://github.com/propfi-protocol/propfi-sdk.git ../propfi-sdk
+          cd ../propfi-sdk
+          npm ci --legacy-peer-deps
+          npm run build
+      - name: Link SDK and install frontend
+        run: |
+          npm ci --legacy-peer-deps
+          rm -rf node_modules/@propfi/sdk
+          ln -s ../propfi-sdk node_modules/@propfi/sdk
       - run: npm run build
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
@@ -32,5 +42,15 @@ jobs:
           node-version: 20
           cache: npm
           cache-dependency-path: package-lock.json
-      - run: npm ci --legacy-peer-deps
+      - name: Setup PropFi SDK
+        run: |
+          git clone https://github.com/propfi-protocol/propfi-sdk.git ../propfi-sdk
+          cd ../propfi-sdk
+          npm ci --legacy-peer-deps
+          npm run build
+      - name: Link SDK and install frontend
+        run: |
+          npm ci --legacy-peer-deps
+          rm -rf node_modules/@propfi/sdk
+          ln -s ../propfi-sdk node_modules/@propfi/sdk
       - run: npm run lint
